@@ -29,8 +29,7 @@ Full-screen media gallery with pan, zoom, rotation, slideshow, video playback, a
 
 Open with `Alt+G` or click any media thumbnail while the script is active.
 
-<!-- Replace with GitHub-hosted video URL -->
-https://i.imgur.com/ESrUZuk.mp4
+https://github.com/user-attachments/assets/5bd98265-1671-42a5-873b-0c7d387a4d19
 
 <details>
 <summary><strong>Keyboard shortcuts</strong></summary>
@@ -60,8 +59,7 @@ https://i.imgur.com/ESrUZuk.mp4
 
 Automatically loads the next page of results as you scroll on both thread and search pages.
 
-<!-- Replace with GitHub-hosted video URL -->
-https://i.imgur.com/nprXm8d.mp4
+https://github.com/user-attachments/assets/0bccb2fa-f157-4892-9744-bd607030d667
 
 ---
 
@@ -69,8 +67,7 @@ https://i.imgur.com/nprXm8d.mp4
 
 Hover over any thumbnail to see a full-size preview. Supports images and video.
 
-<!-- Replace with GitHub-hosted video URL -->
-https://i.imgur.com/kkB4WVb.mp4
+https://github.com/user-attachments/assets/59c0fa55-577e-46a6-8fde-05ff9853d4fa
 
 ---
 
@@ -78,8 +75,7 @@ https://i.imgur.com/kkB4WVb.mp4
 
 Press `F` to toggle image-only mode. Hides text-only posts and shows only posts with media.
 
-<!-- Replace with GitHub-hosted video URL -->
-https://i.imgur.com/MspImEg.mp4
+https://github.com/user-attachments/assets/05017a2e-2cbb-4074-a9ef-3c5daca97467
 
 ---
 
