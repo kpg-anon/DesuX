@@ -24,7 +24,8 @@ All notable changes to `desuX` will be documented here.
 
 - Moved to a modular source layout under `src/modules/` with a build pipeline in `build/build-userscript.mjs`.
 - Gallery navigation arrows now use Lucide `ChevronLeft`/`ChevronRight` icons, vertically centered relative to the visible media area (adjusts for thumbnail strip).
-- Updated `@namespace`, `@downloadURL`, and `@updateURL` to point to the new repository at `github.com/kpg-anon/DesuX`.
+- Updated `@downloadURL` and `@updateURL` to point to the new repository at `github.com/kpg-anon/DesuX`.
+- Added `@license MIT` to userscript metadata.
 - File metadata parsing now handles KiB/MiB/GiB units used by desuarchive.
 - Media collection runs every time the gallery opens (not just on first open), so new items from infinite scroll are always included.
 
