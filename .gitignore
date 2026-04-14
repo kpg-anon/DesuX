@@ -1,0 +1,17 @@
+.codex
+.desux-git/
+memory/
+resources/
+tools/
+dist/
+node_modules/
+src/generated/
+desuX-dev.user.js
+desuX-dev.meta.js
+.env
+.env.*
+*.local
+*.local.*
+*.log
+.DS_Store
+Thumbs.db

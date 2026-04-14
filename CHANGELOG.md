@@ -1,0 +1,56 @@
+# Changelog
+
+All notable changes to `desuX` will be documented here.
+
+## [3.0] - 2026-04-14
+
+### Added
+
+- Complete gallery UI overhaul: ported the React-based gallery from the 4chmg2 project, rendered inside a Shadow DOM with compiled Tailwind CSS.
+- Gallery now features a full-screen lightbox with pan, zoom (scroll wheel), pinch-to-zoom, and keyboard navigation.
+- Thumbnail strip with pink accent border highlighting the currently viewed media, toggled with `T`.
+- Slideshow mode with configurable interval (Space to toggle).
+- Image flip (`H`) and rotation (`R`) with transforms preserved on download.
+- Video player with inline seekbar, play/pause, mute, frame stepping (`< >`), and playback speed controls (`[ ]`).
+- Keyboard shortcut overlay (hover `K` badge in gallery).
+- Fullscreen mode (`F`) with auto-hiding overlay.
+- File size and resolution displayed in gallery info overlay.
+- Thread scroll sync: navigating media in the gallery updates the URL hash and scrolls the background thread to the corresponding post (thread pages only).
+- Cross-origin download support via `GM_xmlhttpRequest` blob fetch, bypassing CORS restrictions.
+- Transformed image downloads: flipped/rotated images are rendered to canvas via `createImageBitmap` and saved with transforms applied.
+- Gallery works on search result pages, collecting all media including items loaded via infinite scroll.
+
+### Changed
+
+- Moved to a modular source layout under `src/modules/` with a build pipeline in `build/build-userscript.mjs`.
+- Gallery navigation arrows now use Lucide `ChevronLeft`/`ChevronRight` icons, vertically centered relative to the visible media area (adjusts for thumbnail strip).
+- Updated `@namespace`, `@downloadURL`, and `@updateURL` to point to the new repository at `github.com/kpg-anon/DesuX`.
+- File metadata parsing now handles KiB/MiB/GiB units used by desuarchive.
+- Media collection runs every time the gallery opens (not just on first open), so new items from infinite scroll are always included.
+
+### Fixed
+
+- Fixed Tailwind CSS candidate extraction losing class names inside template literal expressions, which caused missing hover/opacity/border utilities.
+- Fixed nav arrow images blocked by Content Security Policy (`img-src` rejecting `data:` and `blob:` URLs) by switching to inline SVG.
+- Fixed thumbnail strip border not visible due to Tailwind v4 `@property --tw-border-style` defaulting to `none` in Shadow DOM.
+- Fixed download button navigating away instead of saving files by delegating to `GM_xmlhttpRequest` for cross-origin blob downloads.
+- Fixed file size not displaying in gallery overlay due to metadata extraction stopping before the size text node and regex not matching `KiB`/`MiB` units.
+- Narrowed the Roboto font override so it no longer breaks Font Awesome or other icon fonts on the page.
+- Improved search-page loading with better request pacing and media deduplication.
+
+## [2.6] - 2026-04-13
+
+### Added
+
+- Added a gallery overlay play badge for video thumbnails so `webm` and `mp4` items are easier to distinguish from still images.
+
+### Changed
+
+- Bumped the userscript version to `2.6`.
+- Narrowed the Roboto font override so it no longer breaks Font Awesome or other icon fonts on the page.
+- Improved search-page loading behavior to reduce rate-limit pressure with better request pacing and media deduplication.
+- Improved the `S` hotkey download flow so saving hovered media is more reliable.
+
+### Fixed
+
+- Fixed the image-only `F` toggle so reply quote hover previews continue to work while hidden posts remain filtered from normal view.

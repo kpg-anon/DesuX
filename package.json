@@ -1,0 +1,12 @@
+{
+  "name": "desux-userscript",
+  "private": true,
+  "version": "3.0.0",
+  "description": "Development workspace for the desuX userscript",
+  "scripts": {
+    "build": "node build/build-userscript.mjs",
+    "build:dev": "node build/build-userscript.mjs",
+    "watch": "node --watch build/build-userscript.mjs",
+    "check": "node --check desuX.user.js"
+  }
+}
