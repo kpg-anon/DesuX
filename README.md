@@ -6,8 +6,7 @@
 
 Infinite scrolling &middot; Media preview &middot; Gallery mode &middot; Downloads &middot; Fappe Tyme
 
-[![Install from Greasyfork](https://img.shields.io/badge/Install-Greasyfork-990000?style=for-the-badge&logo=tampermonkey&logoColor=white)](https://greasyfork.org/en/scripts/483282-desu-x-enhancement-script-for-desuarchive-org)
-[![Install from GitHub](https://img.shields.io/badge/Install-GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/kpg-anon/DesuX/raw/main/desuX.user.js)
+[![Install](https://img.shields.io/badge/Install_Userscript-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/kpg-anon/DesuX/raw/main/desuX.user.js)
 
 [![Version](https://img.shields.io/badge/version-3.0-E445FF?style=flat-square)]()
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
@@ -30,7 +29,8 @@ Full-screen media gallery with pan, zoom, rotation, slideshow, video playback, a
 
 Open with `Alt+G` or click any media thumbnail while the script is active.
 
-<https://i.imgur.com/ESrUZuk.mp4>
+<!-- Replace with GitHub-hosted video URL -->
+https://i.imgur.com/ESrUZuk.mp4
 
 <details>
 <summary><strong>Keyboard shortcuts</strong></summary>
@@ -60,7 +60,8 @@ Open with `Alt+G` or click any media thumbnail while the script is active.
 
 Automatically loads the next page of results as you scroll on both thread and search pages.
 
-<https://i.imgur.com/nprXm8d.mp4>
+<!-- Replace with GitHub-hosted video URL -->
+https://i.imgur.com/nprXm8d.mp4
 
 ---
 
@@ -68,7 +69,8 @@ Automatically loads the next page of results as you scroll on both thread and se
 
 Hover over any thumbnail to see a full-size preview. Supports images and video.
 
-<https://i.imgur.com/kkB4WVb.mp4>
+<!-- Replace with GitHub-hosted video URL -->
+https://i.imgur.com/kkB4WVb.mp4
 
 ---
 
@@ -76,7 +78,8 @@ Hover over any thumbnail to see a full-size preview. Supports images and video.
 
 Press `F` to toggle image-only mode. Hides text-only posts and shows only posts with media.
 
-<https://i.imgur.com/MspImEg.mp4>
+<!-- Replace with GitHub-hosted video URL -->
+https://i.imgur.com/MspImEg.mp4
 
 ---
 
@@ -98,25 +101,25 @@ Source files live in `src/`. The installable userscript (`desuX.user.js`) is a g
 
 ```
 src/
-  metadata.txt            # userscript header
-  main.js                 # bootstrap entrypoint
-  assets/base64-icons.js  # embedded icon assets
+  metadata.txt              # userscript header
+  main.js                   # bootstrap entrypoint
+  assets/base64-icons.js    # embedded icon assets
   react-gallery/
-    runtime.jsx            # React gallery component (bundled via esbuild)
+    runtime.jsx             # React gallery component (bundled via esbuild)
   modules/
-    styles.js              # injected CSS
-    state.js               # shared runtime state
-    utils.js               # helper functions
-    page.js                # page-level helpers
-    media-index.js         # media discovery and indexing
-    hover-preview.js       # hover preview behavior
-    search.js              # infinite scroll / search loading
-    gallery.js             # gallery rendering and navigation
-    download.js            # download and filename handling
-    keyboard.js            # keyboard shortcut handling
-    bootstrap.js           # startup wiring
+    styles.js               # injected CSS
+    state.js                # shared runtime state
+    utils.js                # helper functions
+    page.js                 # page-level helpers
+    media-index.js          # media discovery and indexing
+    hover-preview.js        # hover preview behavior
+    search.js               # infinite scroll / search loading
+    gallery.js              # gallery rendering and navigation
+    download.js             # download and filename handling
+    keyboard.js             # keyboard shortcut handling
+    bootstrap.js            # startup wiring
 build/
-  build-userscript.mjs    # zero-dependency build script
+  build-userscript.mjs      # zero-dependency build script
 ```
 
 ### Commands
