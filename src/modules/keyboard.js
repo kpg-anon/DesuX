@@ -1,5 +1,5 @@
 function handleDownloadShortcut(event) {
-    if (event.key.toLowerCase() !== 's' || event.repeat || isEditableElement(document.activeElement)) {
+    if (event.key.toLowerCase() !== 's' || event.repeat || !isSettingEnabled('downloadKey') || isEditableElement(document.activeElement)) {
         return;
     }
 
@@ -15,7 +15,7 @@ function handleDownloadShortcut(event) {
 }
 
 function handleGalleryShortcut(event) {
-    if (event.altKey && event.key.toLowerCase() === 'g') {
+    if (event.altKey && event.key.toLowerCase() === 'g' && (isSettingEnabled('gallery') || isGalleryOpen())) {
         if (!images.length) {
             collectMediaItems();
         }
@@ -37,7 +37,7 @@ function handleGalleryShortcut(event) {
 }
 
 function handleImageOnlyShortcut(event) {
-    if ((event.key !== 'F' && event.key !== 'f') || event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) {
+    if ((event.key !== 'F' && event.key !== 'f') || !isSettingEnabled('imageOnlyKey') || event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) {
         return;
     }
 

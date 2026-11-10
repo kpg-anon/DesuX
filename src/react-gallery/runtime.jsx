@@ -185,6 +185,40 @@ function DesuXReactGallery({ media, initialSelectedIndex, onClose, onIndexChange
     const [speedOverlay, setSpeedOverlay] = useState(null);
     const speedTimeoutRef = useRef(null);
     const [selectedVideoSrc, setSelectedVideoSrc] = useState('');
+    const [blobVersion, setBlobVersion] = useState(0);
+    const blobFallbackRef = useRef(new Set());
+    const fallbackSizesRef = useRef(new Map());
+
+    // A file that does not load from its own URL (the Cloudflare check on some boards) is fetched by the host script.
+    // It is shown from a data: URL, because the Content-Security-Policy of the page refuses blob: URLs.
+    // Keep quote characters out of comments in this file: the build finds Tailwind classes by scanning string literals.
+    const loadViaBlob = useCallback(url => {
+        if (!onFetchBlob || blobFallbackRef.current.has(url) || blobCacheRef.current.has(url)) {
+            return;
+        }
+        blobFallbackRef.current.add(url);
+        onFetchBlob(url)
+            .then(async blob => {
+                const dataUrl = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = () => reject(reader.error);
+                    reader.readAsDataURL(blob);
+                });
+                if (blob.type.startsWith('image/')) {
+                    try {
+                        const bitmap = await createImageBitmap(blob);
+                        fallbackSizesRef.current.set(url, { width: bitmap.width, height: bitmap.height });
+                        bitmap.close();
+                    } catch (error) {
+                        // The size is only shown in the info bar.
+                    }
+                }
+                blobCacheRef.current.set(url, dataUrl);
+                setBlobVersion(version => version + 1);
+            })
+            .catch(() => {});
+    }, [onFetchBlob]);
 
     useEffect(() => {
         if (selectedIndex !== null) {
@@ -208,6 +242,27 @@ function DesuXReactGallery({ media, initialSelectedIndex, onClose, onIndexChange
             }
         }
     }, [selectedIndex]);
+
+    // A mouse wheel only reports vertical movement, which a horizontal strip ignores: turn it into horizontal scrolling.
+    // A native listener, because the wheel listeners React attaches are passive and cannot cancel the event.
+    useEffect(() => {
+        const strip = thumbnailStripRef.current;
+        if (!strip) {
+            return undefined;
+        }
+        const handleStripWheel = event => {
+            if (event.ctrlKey || Math.abs(event.deltaX) >= Math.abs(event.deltaY)) {
+                return;
+            }
+            // deltaMode 1 counts lines (Firefox with a mouse wheel), 2 counts pages.
+            const unit = event.deltaMode === 1 ? 40 : event.deltaMode === 2 ? strip.clientWidth : 1;
+            strip.scrollLeft += event.deltaY * unit * 3;
+            event.preventDefault();
+            event.stopPropagation();
+        };
+        strip.addEventListener('wheel', handleStripWheel, { passive: false });
+        return () => strip.removeEventListener('wheel', handleStripWheel);
+    }, [selectedIndex === null]);
 
     useEffect(() => {
         const handler = () => setIsFullscreen(Boolean(document.fullscreenElement));
@@ -375,10 +430,11 @@ function DesuXReactGallery({ media, initialSelectedIndex, onClose, onIndexChange
                 }
             } else {
                 const img = new Image();
+                img.onerror = () => loadViaBlob(item.url);
                 img.src = item.url;
             }
         }
-    }, [selectedIndex, media]);
+    }, [selectedIndex, media, loadViaBlob]);
 
     useEffect(() => {
         const blobCache = blobCacheRef.current;
@@ -549,7 +605,7 @@ function DesuXReactGallery({ media, initialSelectedIndex, onClose, onIndexChange
         }
 
         setSelectedVideoSrc(blobCacheRef.current.get(item.url) || item.url);
-    }, [selectedIndex, media]);
+    }, [selectedIndex, media, blobVersion]);
 
     useEffect(() => {
         if (selectedIndex === null) {
@@ -883,6 +939,11 @@ function DesuXReactGallery({ media, initialSelectedIndex, onClose, onIndexChange
                                     loop={!isPlaying}
                                     className={`max-w-[90vw] max-h-[95vh] rounded shadow-2xl pointer-events-none transition-opacity duration-200 block ${mediaLoaded ? 'opacity-100' : 'opacity-0'}`}
                                     src={selectedVideoSrc}
+                                    onError={() => {
+                                        if (selectedVideoSrc === selectedItem.url) {
+                                            loadViaBlob(selectedItem.url);
+                                        }
+                                    }}
                                     onLoadedData={() => setMediaLoaded(true)}
                                     onEnded={() => {
                                         if (isPlaying) {
@@ -968,9 +1029,32 @@ function DesuXReactGallery({ media, initialSelectedIndex, onClose, onIndexChange
                         </div>
                     ) : (
                         <div ref={mediaRotateRef} style={{ transition: 'transform 0.15s ease-out' }}>
+                            {(blobCacheRef.current.get(selectedItem.url) || '').startsWith('data:') ? (
+                                // The Content-Security-Policy of the page refuses a data: URL in an img element but
+                                // allows it in an embed element, which Firefox draws like an image.
+                                <embed
+                                    ref={imgRef}
+                                    key={selectedItem.url}
+                                    src={blobCacheRef.current.get(selectedItem.url)}
+                                    type={blobCacheRef.current.get(selectedItem.url).slice(5, blobCacheRef.current.get(selectedItem.url).indexOf(';'))}
+                                    className={`max-w-[90vw] max-h-[95vh] rounded shadow-2xl object-contain transition-opacity duration-200 pointer-events-none ${mediaLoaded ? 'opacity-100' : 'opacity-0'}`}
+                                    onLoad={() => {
+                                        const size = fallbackSizesRef.current.get(selectedItem.url);
+                                        if (size) {
+                                            setDimensions(size);
+                                        }
+                                        setMediaLoaded(true);
+                                    }}
+                                />
+                            ) : (
                             <img
                                 ref={imgRef}
-                                src={selectedItem.url}
+                                src={blobCacheRef.current.get(selectedItem.url) || selectedItem.url}
+                                onError={event => {
+                                    if (event.target.getAttribute('src') === selectedItem.url) {
+                                        loadViaBlob(selectedItem.url);
+                                    }
+                                }}
                                 alt={selectedItem.filename}
                                 fetchPriority="high"
                                 className={`max-w-[90vw] max-h-[95vh] rounded shadow-2xl object-contain transition-opacity duration-200 ${mediaLoaded ? 'opacity-100' : 'opacity-0'}`}
@@ -981,6 +1065,7 @@ function DesuXReactGallery({ media, initialSelectedIndex, onClose, onIndexChange
                                     setMediaLoaded(true);
                                 }}
                             />
+                            )}
                         </div>
                     )}
                 </div>

@@ -1,7 +1,7 @@
 function initializeSearchPage() {
     currentPageNumber = getCurrentPageNumber();
 
-    if (window.location.pathname.includes('/search/')) {
+    if (window.location.pathname.includes('/search/') && isSettingEnabled('infiniteScroll')) {
         $('#footer').hide();
     }
 }
@@ -15,6 +15,8 @@ function attachSearchScrollLoader() {
 }
 
 function initializeApp() {
+    initializeMediaRelay();
+    initializeSettings();
     initializeSearchPage();
     attachKeyboardShortcuts();
     attachSearchScrollLoader();

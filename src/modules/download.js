@@ -33,17 +33,11 @@ function downloadMedia(url, filename) {
         return;
     }
 
-    GM_xmlhttpRequest({
-        method: 'GET',
-        url,
-        responseType: 'blob',
-        onload: function(response) {
-            saveBlob(response.response, filename || getFilenameFromUrl(url));
-        },
-        onerror: function(error) {
-            console.error('Error downloading file:', error);
-            alert('Download failed.');
-        }
+    fetchMediaBlob(url).then((blob) => {
+        saveBlob(blob, filename || getFilenameFromUrl(url));
+    }).catch((error) => {
+        console.error('Error downloading file:', error);
+        alert('Download failed.');
     });
 }
 

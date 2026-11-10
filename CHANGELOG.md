@@ -2,6 +2,26 @@
 
 All notable changes to `desuX` will be documented here.
 
+## [3.1.0] - 2026-11-10
+
+### Added
+
+- Settings menu, opened from the **DesuX** link in the site's top bar or the userscript manager's menu. Hover preview, infinite scroll, gallery mode, the `S` download key, the `F` Fappe Tyme key and the helper tab can each be switched off. Settings are shared between tabs and apply at once.
+- Helper tab for files behind Desuarchive's Cloudflare check (see "Blocked files and the helper tab" in the README). One background tab on `desu-usergeneratedcontent.xyz/desux-helper` fetches the files that a desuarchive.org page is refused and passes them back.
+- Mouse wheel scrolls the gallery's thumbnail strip.
+- `desuX.greasyfork.user.js`, a build output with the Greasy Fork listing's namespace and no update URLs, for Greasy Fork to sync from.
+
+### Changed
+
+- The hover preview is placed beside the pointer and follows it, the way 4chan X places its image hover, instead of sitting in the centre of the window.
+- A file that has to come through the helper tab shows a spinner until it has loaded.
+- Versions are now three-part (`3.1.0`).
+- The build takes its packages from `DESUX_DEPS_DIR` / `DESUX_ESBUILD_DIR` or sibling project folders; the old hard-coded paths no longer existed. The gallery bundle is now built with React 19.2.3 and Tailwind 4.3.3.
+
+### Fixed
+
+- Hover previews, the gallery and `S` downloads on boards whose full-size files Cloudflare checks (`/trash/` since November 2026). They showed a broken image, or saved an HTML page.
+
 ## [3.0] - 2026-04-14
 
 ### Added

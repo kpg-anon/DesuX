@@ -5,7 +5,7 @@ function getCurrentPageNumber() {
 }
 
 function loadMoreContent() {
-    if (loading || !window.location.pathname.includes('/search/')) return;
+    if (loading || !isSettingEnabled('infiniteScroll') || !window.location.pathname.includes('/search/')) return;
 
     const now = Date.now();
     if (now < nextSearchLoadAllowedAt) {

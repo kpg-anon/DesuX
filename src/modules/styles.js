@@ -58,22 +58,139 @@ const desuXStyles = `
     #hover-preview {
         display: none;
         position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+        top: 0;
+        left: 0;
         z-index: 100;
         pointer-events: none;
         max-width: 100vw;
-        max-height: 100vh;
+        max-height: calc(100vh - 25px);
+        line-height: 0;
     }
 
     #hover-preview img,
+    #hover-preview embed,
     #hover-preview video {
+        display: block;
         width: auto;
         height: auto;
         max-width: 100vw;
-        max-height: 100vh;
+        max-height: calc(100vh - 25px);
         object-fit: contain;
+    }
+
+    #hover-preview .desux-preview-spinner {
+        width: 44px;
+        height: 44px;
+        margin: 18px;
+        border: 4px solid rgba(228, 69, 255, 0.25);
+        border-top-color: #e445ff;
+        border-radius: 50%;
+        background: transparent;
+        animation: desux-spin 0.8s linear infinite;
+    }
+
+    @keyframes desux-spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    #hover-preview .desux-preview-note {
+        margin-top: 6px;
+        padding: 6px 10px;
+        border-radius: 4px;
+        background: rgba(0, 0, 0, 0.85);
+        color: #f4f4f4;
+        font: 13px/1.3 sans-serif;
+        white-space: nowrap;
+    }
+
+    #desux-settings {
+        position: fixed;
+        inset: 0;
+        z-index: 100000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.6);
+    }
+
+    #desux-settings .desux-settings-panel {
+        width: 440px;
+        max-width: calc(100vw - 32px);
+        max-height: calc(100vh - 32px);
+        overflow-y: auto;
+        padding: 16px 18px;
+        border: 1px solid #3a3a44;
+        border-radius: 8px;
+        background: #1c1c22;
+        color: #f0f0f0;
+        font: 13px/1.4 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    #desux-settings .desux-settings-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    #desux-settings .desux-settings-header button {
+        border: 0;
+        padding: 0 6px;
+        background: none;
+        color: #aaa;
+        font-size: 20px;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    #desux-settings .desux-settings-header button:hover {
+        color: #e445ff;
+    }
+
+    #desux-settings .desux-settings-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin: 0;
+        padding: 8px 6px;
+        border-radius: 4px;
+        color: inherit;
+        cursor: pointer;
+    }
+
+    #desux-settings .desux-settings-row:hover {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    #desux-settings .desux-settings-row input {
+        margin: 2px 0 0;
+        accent-color: #e445ff;
+    }
+
+    #desux-settings .desux-settings-row strong,
+    #desux-settings .desux-settings-row small {
+        display: block;
+    }
+
+    #desux-settings .desux-settings-row strong {
+        font-weight: 600;
+    }
+
+    #desux-settings .desux-settings-row small {
+        color: #9a9aa6;
+        font-size: 12px;
+    }
+
+    #desux-settings .desux-settings-note {
+        margin-top: 10px;
+        padding: 0 6px;
+        color: #777783;
+        font-size: 12px;
     }
 
     #ig-galleryContainer {
