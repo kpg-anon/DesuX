@@ -20,7 +20,6 @@ const metadataPath = path.join(rootDir, 'src', 'metadata.txt');
 const sourceFiles = [
   path.join(rootDir, 'src', 'modules', 'media-relay.js'),
   path.join(rootDir, 'src', 'modules', 'styles.js'),
-  path.join(rootDir, 'src', 'assets', 'base64-icons.js'),
   reactGalleryStylesPath,
   reactGalleryRuntimePath,
   path.join(rootDir, 'src', 'modules', 'state.js'),
@@ -165,6 +164,29 @@ input[type="range"].video-seekbar::-moz-range-thumb {
 input[type="range"].video-seekbar::-moz-range-progress {
   height: 6px;
   background: var(--accent);
+}
+
+/* The previous/next arrows (NavArrow in runtime.jsx): a 94 x 108 tab on the window edge, shown 64px wide. */
+.nav-arrow {
+  display: block;
+  width: 4rem;
+  aspect-ratio: 94 / 108;
+  background: var(--nav-arrow-bg, #1c1d23);
+  color: var(--nav-arrow-fg, #cccccc);
+}
+
+.nav-arrow-prev {
+  border-radius: 0 6px 6px 0;
+}
+
+.nav-arrow-next {
+  border-radius: 6px 0 0 6px;
+}
+
+.nav-arrow svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 `.trim();
 

@@ -45,9 +45,10 @@ function showHoverPreview(mediaContext) {
             if (!preview.contains(placeholder)) {
                 return;
             }
+            placeholder.remove();
             const note = document.createElement('div');
             note.className = 'desux-preview-note';
-            note.textContent = 'Full file not loaded: ' + ((error && error.message) || error) + '. Open the file in a tab once, then hover again.';
+            note.textContent = 'Full file not loaded: ' + ((error && error.message) || error) + '. Hover again to retry.';
             preview.appendChild(note);
         });
     };

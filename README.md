@@ -8,7 +8,7 @@ Infinite scrolling &middot; Media preview &middot; Gallery mode &middot; Downloa
 
 [![Install](https://img.shields.io/badge/Install_Userscript-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/kpg-anon/DesuX/raw/main/desuX.user.js)
 
-[![Version](https://img.shields.io/badge/version-3.1.0-E445FF?style=flat-square)]()
+[![Version](https://img.shields.io/badge/version-3.1.1-E445FF?style=flat-square)]()
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 
 </div>
@@ -117,7 +117,7 @@ What DesuX does about it:
 1. When a full-size file fails to load, DesuX opens one background tab at `https://desu-usergeneratedcontent.xyz/desux-helper`. The file host answers that address with its ordinary 404 page, which is not checked. The tab is titled "DesuX helper".
 2. The helper tab is on the file host, so its requests carry the cookie. It fetches the file and hands the bytes to the desuarchive.org tab through the userscript manager's shared storage.
 3. The file is shown from a `data:` URL, in an `<embed>` for images and a `<video>` for videos. Desuarchive's Content-Security-Policy refuses `blob:` URLs everywhere and `data:` URLs in `<img>`.
-4. If the browser has no clearance yet, the helper loads the file in a frame on its own page so the check can run there.
+4. If the browser has no clearance yet, the check needs a person: in a background tab nobody sees it, and it often asks for a click. While it is pending, a bar at the top of the desuarchive.org page offers **Open the check**, which opens the file in a foreground tab. Pass the check there (or in the frame the helper tab shows) and close that tab. The helper asks the file host every 4 seconds whether the cookie has arrived, then loads the waiting files. Previews and the gallery wait for it, up to 5 minutes, without a page reload.
 
 What you will notice:
 
@@ -126,7 +126,7 @@ What you will notice:
 - Blocked videos are downloaded whole before they play.
 - The script also runs on `https://desu-usergeneratedcontent.xyz/desux-helper` (nowhere else on the file host) and needs the `GM_openInTab`, `GM_getValue`, `GM_setValue`, `GM_deleteValue`, `GM_listValues` and `GM_addValueChangeListener` grants for this.
 
-If a preview stays on the spinner and then shows an error, open the file in a tab once so the check can pass, then hover again. This was built and tested on Firefox with Violentmonkey.
+If a preview stays on the spinner, look for the bar at the top of the page. This was built and tested on Firefox with Violentmonkey.
 
 ---
 
@@ -144,7 +144,6 @@ Source files live in `src/`. The installable userscript (`desuX.user.js`) is a g
 src/
   metadata.txt              # userscript header
   main.js                   # bootstrap entrypoint
-  assets/base64-icons.js    # embedded icon assets
   react-gallery/
     runtime.jsx             # React gallery component (bundled via esbuild)
   modules/

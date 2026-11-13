@@ -7,9 +7,11 @@ const MEDIA_HOST = 'desu-usergeneratedcontent.xyz';
 const RELAY_REQUESTS_KEY = 'desux-relay-requests';
 const RELAY_HELPER_KEY = 'desux-relay-helper';
 const RELAY_CLOSE_KEY = 'desux-relay-close';
+const RELAY_CHECK_KEY = 'desux-relay-check';
 const RELAY_RESPONSE_PREFIX = 'desux-relay-response:';
 const RELAY_HELPER_PATH = '/desux-helper';
-const RELAY_CLEARANCE_MS = 30000;
+const RELAY_CHECK_WAIT_MS = 5 * 60 * 1000;
+const RELAY_CHECK_POLL_MS = 4000;
 const RELAY_HEARTBEAT_MS = 4000;
 const RELAY_HELPER_STALE_MS = 15000;
 const RELAY_TIMEOUT_MS = 45000;
@@ -34,21 +36,26 @@ function isRelayHelperTab() {
 
 function runRelayHelper() {
     document.title = 'DesuX helper';
-    document.body.textContent = 'DesuX helper tab. It loads full-size files for the previews and gallery on desuarchive.org. '
-        + 'You can close it; DesuX opens it again when it needs it.';
+    document.body.textContent = '';
     document.body.style.cssText = 'margin: 2em; font: 14px sans-serif; color: #ccc; background: #1c1c22;';
+    const status = document.createElement('p');
+    const idleText = 'DesuX helper tab. It loads full-size files for the previews and gallery on desuarchive.org. '
+        + 'You can close it; DesuX opens it again when it needs it.';
+    status.textContent = idleText;
+    document.body.appendChild(status);
 
     const helperId = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
     const seenRequests = new Set();
     let lastRequestAt = Date.now();
     let stopped = false;
+    let clearing = null;
 
     const beat = () => {
         if (stopped) {
             return;
         }
 
-        if (Date.now() - lastRequestAt > RELAY_HELPER_IDLE_MS) {
+        if (!clearing && Date.now() - lastRequestAt > RELAY_HELPER_IDLE_MS) {
             // Unused for a while: stop answering, ask the tab that opened this one to close it, and try directly too.
             stopped = true;
             GM_deleteValue(RELAY_HELPER_KEY);
@@ -67,24 +74,57 @@ function runRelayHelper() {
     // The page's own fetch: it sends the tab's cookies whichever context Violentmonkey runs the script in.
     const pageFetch = typeof unsafeWindow !== 'undefined' && unsafeWindow.fetch ? unsafeWindow.fetch.bind(unsafeWindow) : window.fetch.bind(window);
 
-    // No clearance yet (or it ran out): load the file in a same-origin frame, so Cloudflare's check runs there and
-    // sets the cookie for this tab. One frame at a time; every request that met the check waits for it.
-    let clearing = null;
+    // No clearance yet (or it ran out). Cloudflare's check needs a person: in a background tab nobody sees it, and
+    // it often asks for a click. So while it is pending:
+    // - RELAY_CHECK_KEY tells the desuarchive.org tabs, which offer to open the file in a foreground tab;
+    // - the check also runs in a frame here, so it can be passed in this tab too;
+    // - a HEAD request every few seconds notices the cookie, wherever the check was passed: every tab on the file
+    //   host shares it.
+    // One check at a time; every request that met the check waits for it.
     const getClearance = (url) => {
         if (clearing) {
             return clearing;
         }
 
         clearing = new Promise((resolve) => {
+            GM_setValue(RELAY_CHECK_KEY, { url, t: Date.now() });
+            status.textContent = 'Cloudflare asks for a check before it sends these files. Pass it in the frame below, '
+                + 'or in the tab that the bar on desuarchive.org opens.';
+
             const frame = document.createElement('iframe');
-            frame.style.cssText = 'display: block; width: 480px; height: 360px; margin-top: 1em; border: 1px solid #555;';
+            frame.style.cssText = 'display: block; width: 640px; max-width: 100%; height: 480px; border: 1px solid #555;';
+            let probing = false;
+            let finished = false;
             const done = (passed) => {
+                if (finished) {
+                    return;
+                }
+                finished = true;
                 window.clearTimeout(timer);
+                window.clearInterval(poll);
                 frame.remove();
+                status.textContent = idleText;
+                GM_deleteValue(RELAY_CHECK_KEY);
                 clearing = null;
                 resolve(passed);
             };
-            const timer = window.setTimeout(() => done(false), RELAY_CLEARANCE_MS);
+            const timer = window.setTimeout(() => done(false), RELAY_CHECK_WAIT_MS);
+            const poll = window.setInterval(async () => {
+                if (probing) {
+                    return;
+                }
+                probing = true;
+                try {
+                    const probe = await pageFetch(url, { method: 'HEAD', credentials: 'include', cache: 'no-store' });
+                    if (probe.ok) {
+                        done(true);
+                    }
+                } catch (error) {
+                    // A network error: try again on the next tick.
+                } finally {
+                    probing = false;
+                }
+            }, RELAY_CHECK_POLL_MS);
             frame.addEventListener('load', () => {
                 let type = '';
                 try {
@@ -177,6 +217,9 @@ function runRelayHelper() {
         if (current && current.id === helperId) {
             GM_deleteValue(RELAY_HELPER_KEY);
         }
+        if (clearing) {
+            GM_deleteValue(RELAY_CHECK_KEY);
+        }
     });
 }
 
@@ -217,6 +260,55 @@ function getPendingRelayRequests() {
     const requests = GM_getValue(RELAY_REQUESTS_KEY, []);
     const now = Date.now();
     return Array.isArray(requests) ? requests.filter(request => request && now - request.t < RELAY_TIMEOUT_MS) : [];
+}
+
+/** The Cloudflare check the helper tab is waiting for ({ url, t }), or null. */
+function getRelayCheck() {
+    const check = GM_getValue(RELAY_CHECK_KEY, null);
+    return check && check.url && Date.now() - check.t < RELAY_CHECK_WAIT_MS + RELAY_TIMEOUT_MS ? check : null;
+}
+
+let relayCheckBar = null;
+
+/** A bar at the top of the page while the helper waits for a Cloudflare check, with a button to open the check. */
+function showRelayCheckBar(check) {
+    if (!check) {
+        if (relayCheckBar) {
+            relayCheckBar.remove();
+            relayCheckBar = null;
+        }
+        return;
+    }
+
+    if (!relayCheckBar) {
+        relayCheckBar = document.createElement('div');
+        relayCheckBar.id = 'desux-check-bar';
+
+        const text = document.createElement('span');
+        text.textContent = 'DesuX: Cloudflare asks for a check before it sends the full-size files of this board. '
+            + 'Pass it once in a tab; the previews and gallery then load.';
+
+        const open = document.createElement('button');
+        open.type = 'button';
+        open.textContent = 'Open the check';
+        // Opened from a click, in the foreground: Cloudflare's check has to be seen, and often clicked.
+        open.addEventListener('click', () => {
+            const current = getRelayCheck();
+            if (current) {
+                GM_openInTab(current.url, { active: true, insert: true });
+            }
+        });
+
+        const close = document.createElement('button');
+        close.type = 'button';
+        close.className = 'desux-check-bar-close';
+        close.textContent = '×';
+        close.title = 'Hide';
+        close.addEventListener('click', () => showRelayCheckBar(null));
+
+        relayCheckBar.append(text, open, close);
+        document.body.appendChild(relayCheckBar);
+    }
 }
 
 function isRelayHelperAlive() {
@@ -319,7 +411,17 @@ function fetchMediaViaRelay(url) {
             finish(null, blob);
         });
 
-        timer = window.setTimeout(() => finish(new Error('The helper tab did not answer.')), RELAY_TIMEOUT_MS);
+        // A request waits as long as the helper waits for a Cloudflare check to be passed.
+        const armTimeout = () => {
+            timer = window.setTimeout(() => {
+                if (getRelayCheck()) {
+                    armTimeout();
+                } else {
+                    finish(new Error('The helper tab did not answer.'));
+                }
+            }, RELAY_TIMEOUT_MS);
+        };
+        armTimeout();
         GM_setValue(RELAY_REQUESTS_KEY, [...getPendingRelayRequests(), { id: requestId, url, t: Date.now() }]);
         if (isRelayHelperAlive()) {
             ackTimer = window.setTimeout(watchHelper, RELAY_ACK_MS);
@@ -395,6 +497,9 @@ function initializeMediaRelay() {
             GM_deleteValue(key);
         }
     });
+
+    GM_addValueChangeListener(RELAY_CHECK_KEY, () => showRelayCheckBar(getRelayCheck()));
+    showRelayCheckBar(getRelayCheck());
 
     // The helper cannot close itself; the tab that opened it can.
     GM_addValueChangeListener(RELAY_CLOSE_KEY, () => {

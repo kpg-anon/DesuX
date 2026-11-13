@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Desu X - Enhancement Script for Desuarchive.org
-// @version      3.1.0
+// @version      3.1.1
 // @description  Combines infinite scrolling, media preview on hover, download functionality, Fappe Tyme™ and gallery mode for desuarchive.org. Alt+G to activate gallery mode. 'F' to toggle fappe tyme. Press 'S' while hovering over a thumbnail or in gallery mode to download media with the original filename.
 // @author       kpganon
 // @license      MIT

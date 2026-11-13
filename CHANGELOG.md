@@ -2,6 +2,22 @@
 
 All notable changes to `desuX` will be documented here.
 
+## [3.1.1] - 2026-11-10
+
+### Changed
+
+- The gallery's previous/next buttons are drawn with CSS and an inline SVG: a dark tab on each edge of the window with a grey chevron. Their colours can be restyled through `--nav-arrow-bg` and `--nav-arrow-fg`.
+
+### Fixed
+
+- Without a `cf_clearance` cookie for the file host, previews and the gallery stayed on the spinner until the user opened a file in a tab and reloaded the page. The helper tab ran Cloudflare's check in a frame in a background tab, where nobody could see or click it, and gave up after 30 seconds. Now a bar on the desuarchive.org page offers **Open the check**, which opens the file in a foreground tab; the helper polls the file host with a `HEAD` request every 4 seconds and loads the waiting files as soon as the check has been passed in any tab. Requests wait for the check for up to 5 minutes instead of failing after 45 seconds.
+- A gallery file whose helper request failed was never requested again until the page was reloaded.
+- The hover preview kept its spinner turning beside the error note.
+
+### Removed
+
+- The unused base64 PNG arrow and close images (`src/assets/base64-icons.js`), which also created three `blob:` URLs on every page load.
+
 ## [3.1.0] - 2026-11-10
 
 ### Added

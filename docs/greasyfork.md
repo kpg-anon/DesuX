@@ -52,6 +52,7 @@ DesuX works around this with one background tab on the file host, titled "DesuX 
 
 - A purple spinner in place of the preview until the whole file has arrived.
 - One extra background tab while you browse an affected board. You can close it; it is opened again when it is needed.
+- The first time in a while, Cloudflare wants its check passed by hand. A bar at the top of the page then offers **Open the check**, which opens the file in a tab. Pass the check there and close the tab; the waiting previews load without a page reload.
 - The script asks for more permissions than before, and also runs on `https://desu-usergeneratedcontent.xyz/desux-helper`.
 
 If you do not want the helper tab, switch off "Helper tab for blocked files" in the settings. Files behind the check then do not load.

@@ -105,6 +105,44 @@ const desuXStyles = `
         white-space: nowrap;
     }
 
+    #desux-check-bar {
+        position: fixed;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 100001;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        max-width: calc(100vw - 32px);
+        padding: 8px 12px;
+        border: 1px solid #e445ff;
+        border-top: none;
+        border-radius: 0 0 6px 6px;
+        background: #1c1c22;
+        color: #f4f4f4;
+        font: 13px/1.4 sans-serif;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    }
+
+    #desux-check-bar button {
+        flex: none;
+        padding: 4px 10px;
+        border: none;
+        border-radius: 4px;
+        background: #e445ff;
+        color: #fff;
+        font: inherit;
+        cursor: pointer;
+    }
+
+    #desux-check-bar button.desux-check-bar-close {
+        padding: 0 4px;
+        background: transparent;
+        color: #aaa;
+        font-size: 18px;
+    }
+
     #desux-settings {
         position: fixed;
         inset: 0;

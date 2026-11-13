@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import {
     X, ExternalLink, Download, Play, Pause,
     FlipHorizontal, RotateCw, Maximize2, ChevronDown, ChevronUp,
-    ChevronLeft, ChevronRight, Volume2, VolumeX
+    Volume2, VolumeX
 } from 'lucide-react';
 
 const VIDEO_EXTS = ['.webm', '.mp4'];
@@ -113,16 +113,26 @@ function formatExactTime(tim) {
     return `${mm}${dd}${yy} ${h}:${min}${ampm} ${tz}`;
 }
 
+// The chevron in the 94 x 108 box of the arrow, measured from the arrow images of 4chmg2.
+const CHEVRON_PREV = '53.7,39.2 33.5,54 53.7,68.8';
+const CHEVRON_NEXT = '40.8,39.2 61.1,54 40.8,68.8';
+
+// Drawn with CSS and an inline SVG (classes nav-arrow, nav-arrow-prev, nav-arrow-next in the build script),
+// so the colours can be restyled through --nav-arrow-bg and --nav-arrow-fg.
 function NavArrow({ direction, onClick, visible = true, thumbDocked = false }) {
     const isPrev = direction === 'prev';
-    const Icon = isPrev ? ChevronLeft : ChevronRight;
     return (
         <button
-            className={`absolute ${isPrev ? 'left-0' : 'right-0'} z-50 p-1 cursor-pointer outline-none bg-transparent border-none transition-all duration-300 -translate-y-1/2 ${visible ? 'opacity-70 hover:opacity-100 hover:scale-105 active:scale-95' : 'opacity-0 pointer-events-none'}`}
+            className={`absolute ${isPrev ? 'left-0' : 'right-0'} z-50 p-0 cursor-pointer outline-none bg-transparent border-none transition-all duration-300 -translate-y-1/2 ${visible ? 'opacity-70 hover:opacity-100 hover:scale-105 active:scale-95' : 'opacity-0 pointer-events-none'}`}
             style={{ transformOrigin: isPrev ? 'left center' : 'right center', top: thumbDocked ? 'calc(50% - 2.5rem)' : '50%' }}
+            aria-label={isPrev ? 'Previous' : 'Next'}
             onClick={onClick}
         >
-            <Icon size={48} strokeWidth={3} className="drop-shadow-lg text-white" />
+            <span className={`nav-arrow ${isPrev ? 'nav-arrow-prev' : 'nav-arrow-next'} drop-shadow-lg`}>
+                <svg viewBox="0 0 94 108" aria-hidden="true">
+                    <polyline points={isPrev ? CHEVRON_PREV : CHEVRON_NEXT} fill="none" stroke="currentColor" strokeWidth={8.3} strokeLinecap="round" strokeLinejoin="miter" />
+                </svg>
+            </span>
         </button>
     );
 }
@@ -217,7 +227,10 @@ function DesuXReactGallery({ media, initialSelectedIndex, onClose, onIndexChange
                 blobCacheRef.current.set(url, dataUrl);
                 setBlobVersion(version => version + 1);
             })
-            .catch(() => {});
+            .catch(() => {
+                // Fetched again the next time the file fails to load, for example when it is selected again.
+                blobFallbackRef.current.delete(url);
+            });
     }, [onFetchBlob]);
 
     useEffect(() => {
