@@ -2,6 +2,13 @@
 
 All notable changes to `desuX` will be documented here.
 
+## [3.1.2] - 2026-11-15
+
+### Fixed
+
+- Pressing `F` (Fappe Tyme) in the middle of a thread usually left the window at the bottom of the thread. The scroll offset stayed the same while the page got much shorter, so the browser clamped it to the end. Now the post at the top of the window stays where it was. If that post is hidden, the next post with a file takes its place, and pressing `F` again without scrolling returns to the hidden post.
+- Posts without a file that arrived after `F` was pressed were shown when the others were hidden, and the other way round. `F` now sets every such post to the same state.
+
 ## [3.1.1] - 2026-11-10
 
 ### Changed

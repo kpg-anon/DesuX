@@ -8,7 +8,7 @@ Infinite scrolling &middot; Media preview &middot; Gallery mode &middot; Downloa
 
 [![Install](https://img.shields.io/badge/Install_Userscript-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/kpg-anon/DesuX/raw/main/desuX.user.js)
 
-[![Version](https://img.shields.io/badge/version-3.1.1-E445FF?style=flat-square)]()
+[![Version](https://img.shields.io/badge/version-3.1.2-E445FF?style=flat-square)]()
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 
 </div>
@@ -73,7 +73,7 @@ https://github.com/user-attachments/assets/59c0fa55-577e-46a6-8fde-05ff9853d4fa
 
 ### Fappe Tyme
 
-Press `F` to toggle image-only mode. Hides text-only posts and shows only posts with media.
+Press `F` to toggle image-only mode. Hides text-only posts and shows only posts with media. The window stays on the same part of the thread; pressing `F` again without scrolling returns to the post you were reading.
 
 https://github.com/user-attachments/assets/05017a2e-2cbb-4074-a9ef-3c5daca97467
 
